@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Profile Fetcher</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      color: white;
+      position: relative;
+    }
+
+    video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    #input, button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #posts {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 15px;
+      padding: 20px;
+      width: 80%;
+      max-width: 800px;
+      position: relative; /* So avatar is positioned inside */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .info {
+      flex: 1;
+    }
+
+    .info h2, .info p, .info a {
+      margin: 10px 0;
+      color: #fff;
+    }
+
+    .repos {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .repos li {
+      background: rgba(255, 255, 255, 0.1);
+      margin: 5px 0;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .avatar {
+      width: 100px;
+      border-radius: 50%;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      border: 2px solid white;
+    }
+  </style>
+</head>
+<body>
+
+  <video autoplay muted loop>
+    <source src="https://videos.pexels.com/video-files/3129957/3129957-uhd_2560_1440_25fps.mp4" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
+  <h1>FETCH THE POSTS from Github WEBSITE</h1>
+  <input id="input" type="text" placeholder="Enter GitHub username">
+  <button onclick="fetchdata()">Fetch</button>
+  <div id="posts"></div>
+
+  <script>
+    let parentDiv = document.getElementById("posts");
+    let usernameInput = document.getElementById("input");
+
+    function fetchdata() {
+      let username = usernameInput.value;
+      parentDiv.innerHTML = "";
+
+      fetch(`https://api.github.com/users/${username}`)
+        .then(function (res) {
+          return res.json();
+        })
+        .then(function (userData) {
+          fetch(`https://api.github.com/users/${username}/repos`)
+            .then(function (res) {
+              return res.json();
+            })
+            .then(function (reposData) {
+              let divele = document.createElement("div");
+              divele.className = "card";
+
+              let repoList = reposData.map(function (repo) {
+                return `<li>${repo.name}</li>`;
+              }).join("");
+
+              divele.innerHTML = `
+                <div class="info">
+                  <h2>${userData.login}</h2>
+                  <p>Bio: ${userData.bio ? userData.bio : "No bio available"}</p>
+                  <p>Profile URL: <a href="${userData.html_url}" target="_blank">${userData.html_url}</a></p>
+                  <h3>Repositories:</h3>
+                  <ul class="repos">${repoList}</ul>
+                </div>
+                <img class="avatar" src="${userData.avatar_url}" alt="Avatar">
+              `;
+
+              parentDiv.appendChild(divele);
+            });
+        })
+        .catch(function (err) {
+          console.log("Error fetching data", err);
+          parentDiv.innerHTML = "<p style='color:red;'>User not found or error occurred</p>";
+        });
+    }
+  </script>
+
+</body>
+</html>
