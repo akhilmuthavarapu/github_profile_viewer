@@ -109,7 +109,7 @@
     Your browser does not support HTML5 video.
   </video>
 
-  <h1>FETCH THE POSTS from Github WEBSITE</h1>
+  <h1>GITHUB PROFILE VIEWER</h1>
   <input id="input" type="text" placeholder="Enter GitHub username">
   <button onclick="fetchdata()">Fetch</button>
   <div id="posts"></div>
@@ -132,11 +132,13 @@
               return res.json();
             })
             .then(function (reposData) {
+              console.log(reposData)
               let divele = document.createElement("div");
               divele.className = "card";
+              console.log("length: "+reposData.length)
 
               let repoList = reposData.map(function (repo) {
-                return `<li>${repo.name}</li>`;
+                return `<li><a href= "${repo.html_url}" styel="text-decoration:none">${repo.name}</a></li>`;
               }).join("");
 
               divele.innerHTML = `
@@ -144,6 +146,7 @@
                   <h2>${userData.login}</h2>
                   <p>Bio: ${userData.bio ? userData.bio : "No bio available"}</p>
                   <p>Profile URL: <a href="${userData.html_url}" target="_blank">${userData.html_url}</a></p>
+                  <h3> No. of Repositories : ${reposData.length}</h3>
                   <h3>Repositories:</h3>
                   <ul class="repos">${repoList}</ul>
                 </div>
@@ -155,7 +158,7 @@
         })
         .catch(function (err) {
           console.log("Error fetching data", err);
-          parentDiv.innerHTML = "<p style='color:red;'>User not found or error occurred</p>";
+          parentDiv.innerHTML = "<div style='color:red;'>User not found or error occurred</div>";
         });
     }
   </script>
